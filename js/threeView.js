@@ -1,0 +1,67 @@
+/**
+ * Created by ghassaei on 9/16/16.
+ */
+
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var renderer = new THREE.WebGLRenderer();
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+var scene2 = new THREE.Scene();
+var camera2 = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var renderer2 = new THREE.WebGLRenderer({ alpha: true });
+
+function initThreeJS(){
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    $("#threeDiv").append(renderer.domElement);
+
+    renderer2.setSize( window.innerWidth, window.innerHeight );
+    renderer.setClearColor(0x000000,0);
+    $("#uiDiv").append(renderer2.domElement);
+
+    scene.background = new THREE.Color( 0xffffff );
+
+    camera.position.z = 40;
+    camera2.position.z = 40;
+
+    controls.addEventListener('change', render);
+    controls.enableZoom = false;
+    controls.enablePan = false;
+
+    window.addEventListener('resize', onWindowResize, false);
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    camera2.aspect = window.innerWidth / window.innerHeight;
+    camera2.updateProjectionMatrix();
+
+    renderer2.setSize( window.innerWidth, window.innerHeight );
+}
+
+function render(){
+    //controls.update();
+    renderer.render(scene, camera);
+    renderer2.render(scene2, camera2);
+}
+
+function sceneAdd(object){
+    scene.add(object);
+}
+
+function sceneRemove(object){
+    scene.remove(object);
+}
+
+function scene2Add(object){
+    scene2.add(object);
+}
+
+function scene2Remove(object){
+    scene2.remove(object);
+}
