@@ -7,8 +7,8 @@ $(function() {
 
     initThreeJS();
 
-    var numPleats = 10;
-    var pleatDepth = 1;
+    var numPleats = 30;
+    var pleatDepth = 4;
     var flipPleatDir = false;
 
     var profile = [
@@ -61,6 +61,12 @@ $(function() {
 
     numPleatsSlider.on("slide", function(){
         numPleats = numPleatsSlider.slider('value');
+        rebuildMesh(profileVertices, numPleats);
+    });
+
+    pleatDepthSlider.on("slide", function(){
+        pleatDepth = pleatDepthSlider.slider('value');
+        calcProfileVertices(profile);
         rebuildMesh(profileVertices, numPleats);
     });
 

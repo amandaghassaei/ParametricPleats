@@ -2,6 +2,7 @@ html{
     width:100%;
     height:100%;
     padding:0;
+    font-family: 'Montserrat', sans-serif;
 }
 
 body{
@@ -21,7 +22,7 @@ body{
     position: absolute;
     width: 50%;
     height: 100%;
-    background: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.4);
     z-index: 2;
     top: 0;
     left: 0;
@@ -34,24 +35,31 @@ body{
     left: 0;
 }
 
+#addVertex{
+    display: inline;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 15px;
+}
+
 #title {
-    font-family: 'Montserrat', sans-serif;
     padding: 12px 20px;
     font-size: 40px;
     display: block;
 }
 
 #sliderPanel{
-    padding: 15px;
+    margin-right: 40px;
     position: absolute;
-    bottom: 0;
-    left: 0;
+    top: 0;
+    right: 0;
 }
 
 .slider.slider-horizontal {
-  width: 200px;
-  margin: 0;
-  padding: 20px;
+    width: 200px;
+    margin: 0;
+    padding: 20px;
     top: 10px;
 }
 
@@ -78,7 +86,7 @@ body{
 .flat-slider .ui-slider-handle {
   width: 20px;
   height: 20px;
-  background: #8c7770;
+  background: #6dd0f2;
   border-radius: 50%;
   border: none;
   cursor: pointer;

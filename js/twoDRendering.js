@@ -3,12 +3,15 @@
  */
 
 var profileLine;
-var lineMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 5});
+var lineMaterial = new THREE.LineBasicMaterial({color: 0xffffff, linewidth: 5});
 var lineGeometry = new THREE.Geometry();
 
-var vertexMaterial = new THREE.LineBasicMaterial({color: 0x0000ff});
-var vertexHighlightMaterial = new THREE.LineBasicMaterial({color: 0xff0000});
+var vertexMaterial = new THREE.LineBasicMaterial({color: 0x6dd0f2});
+var vertexHighlightMaterial = new THREE.LineBasicMaterial({color: 0xb3e7f8});
 var vertexGeometry = new THREE.CircleGeometry(1,30);
+
+var bulbMaterial = new THREE.LineBasicMaterial({color: 0xfffb9d});
+var bulbHighlightMaterial = new THREE.LineBasicMaterial({color: 0xfffa84});
 
 var draggableVertices = [];
 var highlightedVertex = null;
@@ -20,6 +23,8 @@ var plane = new THREE.Plane();
 plane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0));
 
 var calcProfileVertices;
+
+var bulbVertex = new DraggableVertex(new THREE.Vector3(0,0,0), true);
 
 function drawProfile(_profile){
 
@@ -76,7 +81,8 @@ function checkIntersections(e){
     if (highlightedVertex === null){
         _.each(draggableVertices, function(vertex){
             vertex.unhighlight();
-        })
+        });
+        bulbVertex.unhighlight();
     }
 }
 
@@ -92,8 +98,14 @@ function deselectVertex(){
     selectedVertex = null;
 }
 
-function DraggableVertex(position){
-    this.mesh = new THREE.Mesh(vertexGeometry, vertexMaterial);
+function DraggableVertex(position, isBulb){
+    this.isBulb = isBulb;
+    if (this.isBulb){
+        var geometry = new THREE.CircleGeometry(3,30);
+        this.mesh = new THREE.Mesh(geometry, bulbMaterial);
+    } else {
+        this.mesh = new THREE.Mesh(vertexGeometry, vertexMaterial);
+    }
     this.mesh.position.set(position.x, position.y, position.z);
     this.mesh._myVertex = this;
     scene2Add(this.mesh);
@@ -104,8 +116,13 @@ DraggableVertex.prototype.getPosition = function(){
 };
 
 DraggableVertex.prototype.move = function(x, y){
-    this.mesh.position.set(x, y, 0);
-    lineGeometry.verticesNeedUpdate = true;
+    if (this.isBulb){
+        this.mesh.position.set(0, y, 0);
+        updateBulbPosition(y);
+    } else {
+        this.mesh.position.set(x, y, 0);
+        lineGeometry.verticesNeedUpdate = true;
+    }
     render2();
 };
 
@@ -120,12 +137,14 @@ DraggableVertex.prototype.deselect = function(){
 };
 
 DraggableVertex.prototype.highlight = function(){
-    this.mesh.material = vertexHighlightMaterial;
+    if (this.isBulb) this.mesh.material = bulbHighlightMaterial;
+    else this.mesh.material = vertexHighlightMaterial;
     render2();
 };
 DraggableVertex.prototype.unhighlight = function(){
     if (this.isSelected) return;
-    this.mesh.material = vertexMaterial;
+    if (this.isBulb) this.mesh.material = bulbMaterial;
+    else this.mesh.material = vertexMaterial;
     render2();
 };
 

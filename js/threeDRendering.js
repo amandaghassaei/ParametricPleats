@@ -3,8 +3,25 @@
  */
 
 
-var meshMaterial = new THREE.MeshNormalMaterial({side:THREE.DoubleSide});
+//var meshMaterial = new THREE.MeshLambertMaterial({color:0xdddddd, side:THREE.DoubleSide});
+var meshMaterial= new THREE.ShaderMaterial( {
+	uniforms: {
+        bulbPosition: {
+            type: '3f',
+            value: [0.0,0.0,0.0]
+        }
+	},
+	vertexShader: document.getElementById('vertexShader').textContent,
+	fragmentShader: document.getElementById('fragmentShader').textContent,
+    side: THREE.DoubleSide
+
+} );
 var mesh;
+
+function updateBulbPosition(y){
+    meshMaterial.uniforms['bulbPosition'].value[1] = y;
+    render();
+}
 
 function rebuildMesh(_profileVertices, _numPleats){
     if (mesh) sceneRemove(mesh);
