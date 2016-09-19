@@ -15,8 +15,12 @@ function rebuildMesh(_profileVertices, _numPleats){
 }
 
 function moveProfile(_profileVertices, _numPleats){
-    mesh.geometry.vertices = makeVertices(_profileVertices, _numPleats);
-    mesh.geometry.verticesNeedUpdate = true;
+    //console.log(_profileVertices);
+    if (mesh){
+        mesh.geometry.vertices = makeVertices(_profileVertices, _numPleats);
+        mesh.geometry.verticesNeedUpdate = true;
+        render();
+    }
 }
 
 function makeGeometry(_profileVertices, _numPleats){

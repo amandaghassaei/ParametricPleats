@@ -19,6 +19,8 @@ var mouse = new THREE.Vector2();
 var plane = new THREE.Plane();
 plane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0));
 
+var calcProfileVertices;
+
 function drawProfile(_profile){
 
     _.each(draggableVertices, function(_vertex){
@@ -40,6 +42,10 @@ function drawProfile(_profile){
     render2();
 }
 
+function attachProfileChangeEvent(_calcProfileVertices){
+    calcProfileVertices = _calcProfileVertices;
+}
+
 function checkIntersections(e){
 
     mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
@@ -51,6 +57,7 @@ function checkIntersections(e){
         var intersection = new THREE.Vector3();
         raycaster.ray.intersectPlane(plane, intersection);
         selectedVertex.move(intersection.x, intersection.y);
+        calcProfileVertices();
         return;
     }
 
@@ -63,7 +70,7 @@ function checkIntersections(e){
             if (thing.object && thing.object._myVertex){
                 highlightedVertex = thing.object._myVertex;
                 highlightedVertex.highlight();
-            } else return;
+            }
         });
     }
     if (highlightedVertex === null){
@@ -81,7 +88,7 @@ function checkSelection(){
 }
 
 function deselectVertex(){
-    selectedVertex.deselect();
+    if (selectedVertex) selectedVertex.deselect();
     selectedVertex = null;
 }
 

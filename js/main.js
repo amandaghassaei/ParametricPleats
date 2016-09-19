@@ -17,26 +17,28 @@ $(function() {
         new THREE.Vector3(-18, 0, 0),
         new THREE.Vector3(-5, -20, 0)
     ];
+    var profileVertices;
 
-    var profileVertices = [
-        [
-            new THREE.Vector3(-10, 20, 0),
-            new THREE.Vector3(-10, 15, 0),
-            new THREE.Vector3(-18, 0, 0),
-            new THREE.Vector3(-5, -20, 0)
-        ],
-        [
-            new THREE.Vector3(-9, 20, 0),
-            new THREE.Vector3(-10, 13, 0),
-            new THREE.Vector3(-17, 0.5, 0),
-            new THREE.Vector3(-4, -20, 0)
-        ]
+    function calcProfileVertices(){
 
-    ];
+        var vertices1 = [];
+        var vertices2 = [];
+
+        _.each(profile, function(vertex){
+            vertices1.push(new THREE.Vector3(vertex.x+pleatDepth/2, vertex.y, 0));
+            vertices2.push(new THREE.Vector3(vertex.x-pleatDepth/2, vertex.y, 0));
+        });
+
+        profileVertices = [vertices1, vertices2];
+
+        moveProfile(profileVertices, numPleats);
+    }
+
+    calcProfileVertices(profile);
 
     rebuildMesh(profileVertices, numPleats);
-
     drawProfile(profile);
+    attachProfileChangeEvent(calcProfileVertices);
 
 
     var numPleatsSlider = $("#numPleats").slider({
@@ -74,6 +76,10 @@ $(function() {
     function mouseUp(e){
         e.preventDefault();
         deselectVertex();
+        controls.reset();
+        //camera.zoom = 8;
+        //camera.updateProjectionMatrix();
+        render();
     }
 
     function mouseDown(e){

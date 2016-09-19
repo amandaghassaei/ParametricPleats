@@ -5,7 +5,7 @@
 var scene = new THREE.Scene();
 var camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 0.1, 1000);
 var renderer = new THREE.WebGLRenderer();
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
+var controls;
 
 var scene2 = new THREE.Scene();
 var camera2 = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 0.1, 1000);
@@ -30,6 +30,7 @@ function initThreeJS(){
     camera2.updateProjectionMatrix();
     camera2.position.z = 40;
 
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.addEventListener('change', render);
     controls.enableZoom = false;
     controls.enablePan = false;
