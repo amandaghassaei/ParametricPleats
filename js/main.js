@@ -89,7 +89,7 @@ $(function() {
             $addVertexDiv.css({
                 left:  e.pageX-15,
                 top:   e.pageY-15
-            })
+            });
         }
 
         checkIntersections(e);
@@ -99,14 +99,19 @@ $(function() {
         e.preventDefault();
         deselectVertex(profile);
         controls.reset();
-        //camera.zoom = 8;
-        //camera.updateProjectionMatrix();
         render();
     }
 
     function mouseDown(e){
         e.preventDefault();
-        checkSelection();
+        if (shouldAddVertex){
+            //checkAddVertex();
+            shouldAddVertex = false;
+            $addVertexDiv.hide();
+        } else {
+            checkSelection();
+        }
+
     }
 
     $('#addVertexMode').click(function(e){
