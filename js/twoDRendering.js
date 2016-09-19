@@ -97,21 +97,24 @@ function checkSelection(){
 
 function deselectVertex(_profile){
     if (selectedVertex) {
-        var intersections = raycaster.intersectObjects(scene2.children);
-        if (intersections.length > 0) {
-            _.each(intersections, function(thing){
-                if (thing.object && thing.object._myVertex && thing.object._myVertex !== selectedVertex){
-                    //collapse two vertices on each other
-                    var index = draggableVertices.indexOf(selectedVertex);
-                    console.log(index);
-                    _profile.splice(index, 1);
-                    draggableVertices.splice(index, 1);
-                    selectedVertex.destroy();
-                    selectedVertex = null;
-                    drawProfile(_profile);
-                    calcProfileVertices(true);
+        if (draggableVertices.length>2) {
+            var intersections = raycaster.intersectObjects(scene2.children);
+            if (intersections.length > 0) {
+                if (draggableVertices.length > 2) {
                 }
-            });
+                _.each(intersections, function (thing) {
+                    if (thing.object && thing.object._myVertex && thing.object._myVertex !== selectedVertex) {
+                        //collapse two vertices on each other
+                        var index = draggableVertices.indexOf(selectedVertex);
+                        _profile.splice(index, 1);
+                        draggableVertices.splice(index, 1);
+                        selectedVertex.destroy();
+                        selectedVertex = null;
+                        drawProfile(_profile);
+                        calcProfileVertices(true);
+                    }
+                });
+            }
         }
         if (selectedVertex) selectedVertex.deselect();
     }
