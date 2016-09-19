@@ -11,6 +11,9 @@ $(function() {
     var pleatDepth = 4;
     var flipPleatDir = false;
 
+    var shouldAddVertex = false;
+    var $addVertexDiv = $("#newVertex");
+
     var profile = [
         new THREE.Vector3(-10, 20, 0),
         new THREE.Vector3(-10, 15, 0),
@@ -80,6 +83,15 @@ $(function() {
 
     function mouseMove(e){
         e.preventDefault();
+
+        if (shouldAddVertex){
+            $addVertexDiv.show();
+            $addVertexDiv.css({
+                left:  e.pageX-15,
+                top:   e.pageY-15
+            })
+        }
+
         checkIntersections(e);
     }
 
@@ -96,5 +108,10 @@ $(function() {
         e.preventDefault();
         checkSelection();
     }
+
+    $('#addVertexMode').click(function(e){
+        e.preventDefault();
+        shouldAddVertex = true;
+    })
 
 });

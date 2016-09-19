@@ -36,11 +36,39 @@ body{
 }
 
 #addVertex{
-    display: inline;
+    display: block;
+    background: #6dd0f2;
+    width: 90px;
+    height: 90px;
+    border-radius: 45px;
+    text-align:center;
+    line-height: 90px;
+    text-decoration: none;
+}
+
+#addVertexMode {
+    display: block;
     position: absolute;
     bottom: 0;
     left: 0;
     margin: 15px;
+    z-index: 10;
+    text-decoration: none;
+}
+
+a {color:#000000;}      /* unvisited link */
+a:visited {color:#000000;}  /* visited link */
+a:hover {color:#000000;}  /* mouse over link */
+a:active {color:#000000;}  /* selected link */
+
+#newVertex{
+    display: none;
+    position: absolute;
+    background: #6dd0f2;
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    z-index: 10;
 }
 
 #title {
