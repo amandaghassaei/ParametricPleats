@@ -92,7 +92,7 @@ $(function() {
             });
         }
 
-        checkIntersections(e);
+        checkIntersections(e, shouldAddVertex);
     }
 
     function mouseUp(e){
@@ -105,7 +105,7 @@ $(function() {
     function mouseDown(e){
         e.preventDefault();
         if (shouldAddVertex){
-            //checkAddVertex();
+            addVertex(profile);
             shouldAddVertex = false;
             $addVertexDiv.hide();
         } else {

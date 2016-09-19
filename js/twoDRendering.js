@@ -2,9 +2,9 @@
  * Created by ghassaei on 9/18/16.
  */
 
-var profileLine;
+var profileLines = [];
 var lineMaterial = new THREE.LineBasicMaterial({color: 0xffffff, linewidth: 5});
-var lineGeometry = new THREE.Geometry();
+var highlightedLineMaterial = new THREE.LineBasicMaterial({color: 0xd9f3fc, linewidth: 5});
 
 var vertexMaterial = new THREE.LineBasicMaterial({color: 0x6dd0f2});
 var vertexHighlightMaterial = new THREE.LineBasicMaterial({color: 0xb3e7f8});
@@ -16,6 +16,8 @@ var bulbHighlightMaterial = new THREE.LineBasicMaterial({color: 0xfffa84});
 var draggableVertices = [];
 var highlightedVertex = null;
 var selectedVertex = null;
+
+var highlightedLine = null;
 
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
@@ -38,13 +40,25 @@ function drawProfile(_profile){
         _profile[index] = vertex.getPosition();
     });
 
-    if (profileLine) scene2Remove(profileLine);
-    lineGeometry = new THREE.Geometry();
-    lineGeometry.vertices = _profile;
-    lineGeometry.dynamic = true;
-    profileLine = new THREE.Line(lineGeometry, lineMaterial);
+    _.each(profileLines, function(line){
+        if (line) {
+            line._highlightableLine = null;
+            scene2Remove(line);
+        }
+    });
+    profileLines = [];
+    _.each(_profile, function(_position, index){
+        if (index < _profile.length-1){
+            var lineGeometry = new THREE.Geometry();
+            lineGeometry.vertices = [_position, _profile[index+1]];
+            lineGeometry.dynamic = true;
+            var line = new THREE.Line(lineGeometry, lineMaterial);
+            line._highlightableLine = line;
+            profileLines.push(line);
+            scene2Add(line);
+        }
+    });
 
-    scene2Add(profileLine);
     render2();
 }
 
@@ -52,7 +66,7 @@ function attachProfileChangeEvent(_calcProfileVertices){
     calcProfileVertices = _calcProfileVertices;
 }
 
-function checkIntersections(e){
+function checkIntersections(e, shouldAdd){
 
     mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
@@ -64,19 +78,32 @@ function checkIntersections(e){
         raycaster.ray.intersectPlane(plane, intersection);
         selectedVertex.move(intersection.x, intersection.y);
         calcProfileVertices();
+        render2();
         return;
     }
 
     var intersections = raycaster.intersectObjects(scene2.children);
 
     highlightedVertex = null;
+    highlightedLine = null;
 
     if (intersections.length > 0) {
         _.each(intersections, function(thing){
+            if (shouldAdd){
+                if (thing.object && thing.object._highlightableLine) {
+                    highlightedLine = thing.object._highlightableLine;
+                    highlightedLine.material = highlightedLineMaterial;
+                }
+            }
             if (thing.object && thing.object._myVertex){
                 highlightedVertex = thing.object._myVertex;
                 highlightedVertex.highlight();
             }
+        });
+    }
+    if (highlightedLine === null){
+        _.each(profileLines, function(line){
+            line.material = lineMaterial;
         });
     }
     if (highlightedVertex === null){
@@ -85,6 +112,23 @@ function checkIntersections(e){
         });
         bulbVertex.unhighlight();
     }
+    render2();
+}
+
+function addVertex(_profile){
+
+    if (highlightedLine === null) return;
+
+    var intersection = new THREE.Vector3();
+    raycaster.ray.intersectPlane(plane, intersection);
+
+    //figure out at what index this vertex should go
+    var index = profileLines.indexOf(highlightedLine);
+    if (index<0) return;
+    _profile.splice(index+1, 0, intersection);
+
+    drawProfile(_profile);
+    calcProfileVertices(true);
 }
 
 
@@ -93,6 +137,7 @@ function checkSelection(){
         highlightedVertex.select();
         selectedVertex = highlightedVertex;
     }
+    render2();
 }
 
 function deselectVertex(_profile){
@@ -120,6 +165,7 @@ function deselectVertex(_profile){
     }
     selectedVertex = null;
     highlightedVertex = null;
+    render2();
 }
 
 function DraggableVertex(position, isBulb){
@@ -145,9 +191,11 @@ DraggableVertex.prototype.move = function(x, y){
         updateBulbPosition(y);
     } else {
         this.mesh.position.set(x, y, 0);
-        lineGeometry.verticesNeedUpdate = true;
+        _.each(profileLines, function(line){
+            line.geometry.verticesNeedUpdate = true;
+            line.geometry.computeBoundingSphere();
+        });
     }
-    render2();
 };
 
 DraggableVertex.prototype.select = function(){
@@ -163,13 +211,11 @@ DraggableVertex.prototype.deselect = function(){
 DraggableVertex.prototype.highlight = function(){
     if (this.isBulb) this.mesh.material = bulbHighlightMaterial;
     else this.mesh.material = vertexHighlightMaterial;
-    render2();
 };
 DraggableVertex.prototype.unhighlight = function(){
     if (this.isSelected) return;
     if (this.isBulb) this.mesh.material = bulbMaterial;
     else this.mesh.material = vertexMaterial;
-    render2();
 };
 
 DraggableVertex.prototype.destroy = function(){
