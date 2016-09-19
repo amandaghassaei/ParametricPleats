@@ -3,12 +3,13 @@
  */
 
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 0.1, 1000);
 var renderer = new THREE.WebGLRenderer();
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 var scene2 = new THREE.Scene();
-var camera2 = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var camera2 = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 0.1, 1000);
+//var camera2 = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 var renderer2 = new THREE.WebGLRenderer({ alpha: true });
 
 function initThreeJS(){
@@ -22,7 +23,11 @@ function initThreeJS(){
 
     scene.background = new THREE.Color( 0xffffff );
 
+    camera.zoom = 8;
+    camera.updateProjectionMatrix();
     camera.position.z = 40;
+    camera2.zoom = 8;
+    camera2.updateProjectionMatrix();
     camera2.position.z = 40;
 
     controls.addEventListener('change', render);
@@ -47,6 +52,9 @@ function onWindowResize() {
 function render(){
     //controls.update();
     renderer.render(scene, camera);
+}
+
+function render2(){
     renderer2.render(scene2, camera2);
 }
 
