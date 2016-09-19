@@ -19,7 +19,7 @@ $(function() {
     ];
     var profileVertices;
 
-    function calcProfileVertices(){
+    function calcProfileVertices(shouldRebuild){
 
         var vertices1 = [];
         var vertices2 = [];
@@ -31,10 +31,14 @@ $(function() {
 
         profileVertices = [vertices1, vertices2];
 
-        moveProfile(profileVertices, numPleats);
+        if (shouldRebuild){
+            rebuildMesh(profileVertices, numPleats);
+        } else {
+            moveProfile(profileVertices, numPleats);
+        }
     }
 
-    calcProfileVertices(profile);
+    calcProfileVertices();
 
     rebuildMesh(profileVertices, numPleats);
     drawProfile(profile);
@@ -81,7 +85,7 @@ $(function() {
 
     function mouseUp(e){
         e.preventDefault();
-        deselectVertex();
+        deselectVertex(profile);
         controls.reset();
         //camera.zoom = 8;
         //camera.updateProjectionMatrix();
