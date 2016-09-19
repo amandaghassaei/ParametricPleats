@@ -21,7 +21,7 @@ body{
     position: absolute;
     width: 50%;
     height: 100%;
-    background: rgba(200,200,200,0.24);
+    background: rgba(255,255,255,0.5);
     z-index: 2;
     top: 0;
     left: 0;

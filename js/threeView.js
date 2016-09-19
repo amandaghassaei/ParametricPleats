@@ -21,7 +21,7 @@ function initThreeJS(){
     renderer.setClearColor(0x000000,0);
     $("#uiDiv").append(renderer2.domElement);
 
-    scene.background = new THREE.Color( 0xffffff );
+    scene.background = new THREE.Color( 0xeeeeee);
 
     camera.zoom = 8;
     camera.updateProjectionMatrix();
