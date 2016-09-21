@@ -13,7 +13,7 @@
 //    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
 //    Pan - right mouse, or arrow keys / touch: three finter swipe
 
-THREE.OrbitControls = function ( object, domElement ) {
+THREE.OrbitControls = function ( object, domElement, zoomCallback ) {
 
 	this.object = object;
 
@@ -100,7 +100,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.target.copy( scope.target0 );
 		scope.object.position.copy( scope.position0 );
-		scope.object.zoom = scope.zoom0;
+		//scope.object.zoom = scope.zoom0;
 
 		scope.object.updateProjectionMatrix();
 		scope.dispatchEvent( changeEvent );
@@ -510,6 +510,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		}
 
 		scope.update();
+
+		zoomCallback(object.zoom);
 
 	}
 

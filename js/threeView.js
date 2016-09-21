@@ -9,7 +9,6 @@ var controls;
 
 var scene2 = new THREE.Scene();
 var camera2 = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 0.1, 1000);
-//var camera2 = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 var renderer2 = new THREE.WebGLRenderer({ alpha: true, antialias: true});
 
 var depthMaterial, effectComposer, depthRenderTarget, ssaoPass;
@@ -38,9 +37,15 @@ function initThreeJS(){
     camera2.updateProjectionMatrix();
     camera2.position.z = 400;
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement, function(zoom){
+        camera2.zoom = zoom;
+        camera2.updateProjectionMatrix();
+        render2();
+    });
     controls.addEventListener('change', render);
-    controls.enableZoom = false;
+    //controls.enableZoom = false;
+    controls.minZoom = 3;
+	controls.maxZoom = 10;
     controls.enablePan = false;
 
     initPostprocessing();
@@ -51,7 +56,7 @@ function initThreeJS(){
 function initPostprocessing() {
 
     // Setup render pass
-    var renderPass = new THREE.RenderPass( scene, camera );
+    var renderPass = new THREE.RenderPass(scene, camera);
     //renderPass.renderToScreen = true;
 
     // Setup depth pass
@@ -82,21 +87,32 @@ function initPostprocessing() {
 }
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth*dpr/window.innerHeight*dpr;
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.left = -window.innerWidth/2;
+    camera.right = window.innerWidth/2;
+    camera.top = window.innerHeight/2;
+    camera.bottom = -window.innerHeight/2;
     camera.updateProjectionMatrix();
-    camera2.aspect = window.innerWidth*dpr/window.innerHeight*dpr;
+    camera2.aspect = window.innerWidth/window.innerHeight;
+    camera2.left = -window.innerWidth/2;
+    camera2.right = window.innerWidth/2;
+    camera2.top = window.innerHeight/2;
+    camera2.bottom = -window.innerHeight/2;
     camera2.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth*dpr, window.innerHeight*dpr);
-    renderer2.setSize( window.innerWidth*dpr, window.innerHeight*dpr);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer2.setSize( window.innerWidth, window.innerHeight);
 
-    // Resize renderTargets
-    ssaoPass.uniforms[ 'size' ].value.set(window.innerWidth, window.innerHeight);
+    //// Resize renderTargets
+    //ssaoPass.uniforms[ 'size' ].value.set(window.innerWidth, window.innerHeight);
+    //
+    //var newWidth  = Math.floor( window.innerWidth/dpr ) || 1;
+    //var newHeight = Math.floor( window.innerHeight/dpr ) || 1;
+    //depthRenderTarget.setSize( newWidth, newHeight );
+    //effectComposer.setSize( newWidth, newHeight );
 
-    var newWidth  = Math.floor( window.innerWidth/dpr ) || 1;
-    var newHeight = Math.floor( window.innerHeight/dpr ) || 1;
-    depthRenderTarget.setSize( newWidth, newHeight );
-    effectComposer.setSize( newWidth, newHeight );
+    render();
+    render2();
 }
 
 function render(){
