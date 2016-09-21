@@ -12,6 +12,7 @@ $(function() {
     var flipPleatDir = false;
 
     var shouldAddVertex = false;
+    var justAddedVertex = false;
     var $addVertexDiv = $("#newVertex");
 
     var profile = [
@@ -97,7 +98,12 @@ $(function() {
 
     function mouseUp(e){
         e.preventDefault();
-        deselectVertex(profile);
+        if (justAddedVertex) {
+            justAddedVertex = false;
+        } else {
+            deselectVertex(profile);
+        }
+
         controls.reset();
         render();
     }
@@ -105,8 +111,9 @@ $(function() {
     function mouseDown(e){
         e.preventDefault();
         if (shouldAddVertex){
-            addVertex(profile);
+            addVertex(profile, e);
             shouldAddVertex = false;
+            justAddedVertex = true;
             $addVertexDiv.hide();
         } else {
             checkSelection();

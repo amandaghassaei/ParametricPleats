@@ -115,7 +115,7 @@ function checkIntersections(e, shouldAdd){
     render2();
 }
 
-function addVertex(_profile){
+function addVertex(_profile, e){
 
     if (highlightedLine === null) return;
 
@@ -129,6 +129,7 @@ function addVertex(_profile){
 
     drawProfile(_profile);
     calcProfileVertices(true);
+    checkIntersections(e, false);
 }
 
 
@@ -141,6 +142,7 @@ function checkSelection(){
 }
 
 function deselectVertex(_profile){
+    highlightedVertex = null;
     if (selectedVertex) {
         if (draggableVertices.length>2) {
             var intersections = raycaster.intersectObjects(scene2.children);
@@ -153,10 +155,13 @@ function deselectVertex(_profile){
                         var index = draggableVertices.indexOf(selectedVertex);
                         _profile.splice(index, 1);
                         draggableVertices.splice(index, 1);
+                        var indexLeftoverVertex = draggableVertices.indexOf(thing.object._myVertex);
                         selectedVertex.destroy();
                         selectedVertex = null;
                         drawProfile(_profile);
                         calcProfileVertices(true);
+                        highlightedVertex = draggableVertices[indexLeftoverVertex];
+                        highlightedVertex.highlight();
                     }
                 });
             }
@@ -164,7 +169,6 @@ function deselectVertex(_profile){
         if (selectedVertex) selectedVertex.deselect();
     }
     selectedVertex = null;
-    highlightedVertex = null;
     render2();
 }
 
