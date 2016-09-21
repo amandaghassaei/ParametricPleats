@@ -24,7 +24,9 @@ $(function() {
     var profileVertices;
 
     var svg;
+    var svgPreview;
     $("#svgDiv").svg({onLoad: function(_svg){svg = _svg;}});//svg renderer
+    $("#svgPreview").svg({onLoad: function(_svg){svgPreview = _svg;}});//svg renderer
 
     function calcProfileVertices(shouldRebuild){
 
@@ -43,7 +45,7 @@ $(function() {
         } else {
             moveProfile(profileVertices, numPleats);
         }
-        drawSVG();
+        drawSVG(svgPreview, true);
     }
 
     calcProfileVertices();
@@ -51,6 +53,11 @@ $(function() {
     rebuildMesh(profileVertices, numPleats);
     drawProfile(profile);
     attachProfileChangeEvent(calcProfileVertices);
+
+    window.addEventListener('resize', function(){
+        onWindowResizeThree();
+        drawSVG(svgPreview, true);
+    }, false);
 
 
     var numPleatsSlider = $("#numPleats").slider({
@@ -135,23 +142,44 @@ $(function() {
         saveSVG();
     });
 
-    function drawSVG(){
+
+    function drawSVG(_svg, isPreview){
         var rawProfile = profile;
-        $("svg").html("");//clear svg tag from last draw
+        _svg.clear(true);//clear svg tag from last draw
         var scoreSettings = {stroke: 'black', fill: 'none', strokeWidth: 1, strokeDashArray:"2, 2"};
-        var score = svg.group(scoreSettings);
-        var solid = svg.group({stroke: 'black', fill: 'none', strokeWidth: 1});
+        var solidSettings = {stroke: 'black', fill: 'none', strokeWidth: 1};
+        if (isPreview) {
+            solidSettings.stroke = "white";
+            solidSettings.strokeWidth = 1;
+            scoreSettings = solidSettings;
+        }
+        var score = _svg.group(scoreSettings);
+        var solid = _svg.group(solidSettings);
+
         var margin = 30;
         var scale = 2;
+        if (isPreview) {
+            margin = 0;
+            var length = 0;
+            _.each(rawProfile, function(vertex, index) {
+                if (index == 0) return;
+                var v1 = vertex.clone().sub(rawProfile[index-1]);
+                length += v1.length()*5;
+            });
+            var divHeight = $("#svgPreview").innerHeight();
+            scale = divHeight/length;//scale to div height
+        }
+
         var _pleatDepth = pleatDepth*scale;
-        svg.line(solid, margin, margin, margin+numPleats*_pleatDepth*2, margin);
+
+        _svg.line(solid, margin, margin, margin+numPleats*_pleatDepth*2, margin);
         var yOffset = 0;
         _.each(rawProfile, function(vertex, index){
             if (index>0 && index<rawProfile.length-1){
                 var v1 = vertex.clone().sub(rawProfile[index-1]);
                 var v2 = vertex.clone().sub(rawProfile[index+1]).normalize();
 
-                yOffset+= v1.length()*10;
+                yOffset+= v1.length()*5*scale;
                 v1.normalize();
 
                 var theta = Math.acos(v1.dot(v2));
@@ -165,22 +193,23 @@ $(function() {
                     if (i%2==0) polyLineVertices.push([margin+i*_pleatDepth, margin+yOffset+sign*deltaY]);
                     else polyLineVertices.push([margin+i*_pleatDepth, margin+yOffset-sign*deltaY]);
                 }
-                svg.polyline(polyLineVertices, scoreSettings);
+                _svg.polyline(polyLineVertices, scoreSettings);
             } else if (index == rawProfile.length-1){
                 var v1 = vertex.clone().sub(rawProfile[index-1]);
-                yOffset+= v1.length()*10;
+                yOffset+= v1.length()*5*scale;
             }
         });
         for (var i=0;i<=2*numPleats;i++){
             var group = score;
             if (i==0 || i== 2*numPleats) group = solid;
-            svg.line(group, margin+i*_pleatDepth, margin, margin+i*_pleatDepth, yOffset+margin);
+            _svg.line(group, margin+i*_pleatDepth, margin, margin+i*_pleatDepth, yOffset+margin);
         }
-        svg.line(solid, margin, yOffset+margin, margin+numPleats*_pleatDepth*2, yOffset+margin);
+        _svg.line(solid, margin, yOffset+margin, margin+numPleats*_pleatDepth*2, yOffset+margin);
     }
 
     function saveSVG(){
-        var svgData = $("svg")[0].outerHTML;
+        drawSVG(svg);
+        var svgData = $("#svgDiv>svg")[0].outerHTML;
         var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
         var svgUrl = URL.createObjectURL(svgBlob);
         var downloadLink = document.createElement("a");

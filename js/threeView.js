@@ -49,8 +49,6 @@ function initThreeJS(){
     controls.enablePan = false;
 
     initPostprocessing();
-
-    window.addEventListener('resize', onWindowResize, false);
 }
 
 function initPostprocessing() {
@@ -86,7 +84,7 @@ function initPostprocessing() {
 
 }
 
-function onWindowResize() {
+function onWindowResizeThree() {
     camera.aspect = window.innerWidth/window.innerHeight;
     camera.left = -window.innerWidth/2;
     camera.right = window.innerWidth/2;
