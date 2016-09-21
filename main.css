@@ -153,7 +153,7 @@ a:active {color:#000000;}  /* selected link */
 }
 
 #svgDiv{
-    /*display: none;*/
+    display: none;
     position: absolute;
     width:600px;
     height:600px;
@@ -161,4 +161,12 @@ a:active {color:#000000;}  /* selected link */
     left:0;
     z-index: 10;
     background: white;
+}
+
+#download{
+    position: absolute;
+    bottom:0;
+    right:0;
+    z-index: 5;
+    margin:30px;
 }

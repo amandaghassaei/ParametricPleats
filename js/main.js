@@ -30,7 +30,8 @@ $(function() {
     ];
     var profileVertices;
 
-    $("#svgDiv").svg({onLoad: saveSVG});//svg renderer
+    var svg;
+    $("#svgDiv").svg({onLoad: function(_svg){svg = _svg;}});//svg renderer
 
     function calcProfileVertices(shouldRebuild){
 
@@ -135,16 +136,25 @@ $(function() {
         shouldAddVertex = true;
     });
 
-    function saveSVG(svg){
-        var g = svg.group({stroke: 'black', strokeWidth: 1, strokeDasharray:"10, 10"});
+    $("#download").click(function(e){
+        e.preventDefault();
+        saveSVG();
+    });
+
+    function saveSVG(){
+        $("svg").html("");//clear svg tag from last draw
+        var score = svg.group({stroke: 'black', strokeWidth: 1, strokeDashArray:"2, 2"});
+        var solid = svg.group({stroke: 'black', strokeWidth: 1});
         var margin = 30;
         var scale = 2;
         var _pleatDepth = pleatDepth*scale;
         for (var i=0;i<=2*numPleats;i++){
-            svg.line(g, margin+i*_pleatDepth, margin, margin+i*_pleatDepth, 500+margin);
+            var group = score;
+            if (i==0 || i== 2*numPleats) group = solid;
+            svg.line(group, margin+i*_pleatDepth, margin, margin+i*_pleatDepth, 500+margin);
         }
-        svg.line(g, margin, margin, margin+numPleats*_pleatDepth*2, margin);
-        svg.line(g, margin, 500+margin, margin+numPleats*_pleatDepth*2, 500+margin);
+        svg.line(solid, margin, margin, margin+numPleats*_pleatDepth*2, margin);
+        svg.line(solid, margin, 500+margin, margin+numPleats*_pleatDepth*2, 500+margin);
         //_.each(profile, function(vertex, index){
         //    if (index<rawProfile.length-1){
         //        svg.line(g, vertex.x+200, -vertex.y+200, rawProfile[index+1].x+200, -rawProfile[index+1].y+200);
@@ -156,9 +166,9 @@ $(function() {
         var downloadLink = document.createElement("a");
         downloadLink.href = svgUrl;
         downloadLink.download = "lamp.svg";
-        //document.body.appendChild(downloadLink);
-        //downloadLink.click();
-        //document.body.removeChild(downloadLink);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
     }
 
 
