@@ -147,8 +147,6 @@ function deselectVertex(_profile){
         if (draggableVertices.length>2) {
             var intersections = raycaster.intersectObjects(scene2.children);
             if (intersections.length > 0) {
-                if (draggableVertices.length > 2) {
-                }
                 _.each(intersections, function (thing) {
                     if (thing.object && thing.object._myVertex && thing.object._myVertex !== selectedVertex) {
                         //collapse two vertices on each other
@@ -167,8 +165,8 @@ function deselectVertex(_profile){
             }
         }
         if (selectedVertex) selectedVertex.deselect();
+        selectedVertex = null;
     }
-    selectedVertex = null;
     render2();
 }
 
