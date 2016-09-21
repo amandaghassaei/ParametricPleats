@@ -15,13 +15,6 @@ $(function() {
     var justAddedVertex = false;
     var $addVertexDiv = $("#newVertex");
 
-    var rawProfile = [
-        new THREE.Vector3(-10, 20, 0),
-        new THREE.Vector3(-10, 15, 0),
-        new THREE.Vector3(-18, 0, 0),
-        new THREE.Vector3(-5, -20, 0)
-    ];
-
     var profile = [
         new THREE.Vector3(-10, 20, 0),
         new THREE.Vector3(-10, 15, 0),
@@ -50,6 +43,7 @@ $(function() {
         } else {
             moveProfile(profileVertices, numPleats);
         }
+        drawSVG();
     }
 
     calcProfileVertices();
@@ -141,25 +135,51 @@ $(function() {
         saveSVG();
     });
 
-    function saveSVG(){
+    function drawSVG(){
+        var rawProfile = profile;
         $("svg").html("");//clear svg tag from last draw
-        var score = svg.group({stroke: 'black', strokeWidth: 1, strokeDashArray:"2, 2"});
-        var solid = svg.group({stroke: 'black', strokeWidth: 1});
+        var scoreSettings = {stroke: 'black', fill: 'none', strokeWidth: 1, strokeDashArray:"2, 2"};
+        var score = svg.group(scoreSettings);
+        var solid = svg.group({stroke: 'black', fill: 'none', strokeWidth: 1});
         var margin = 30;
         var scale = 2;
         var _pleatDepth = pleatDepth*scale;
+        svg.line(solid, margin, margin, margin+numPleats*_pleatDepth*2, margin);
+        var yOffset = 0;
+        _.each(rawProfile, function(vertex, index){
+            if (index>0 && index<rawProfile.length-1){
+                var v1 = vertex.clone().sub(rawProfile[index-1]);
+                var v2 = vertex.clone().sub(rawProfile[index+1]).normalize();
+
+                yOffset+= v1.length()*10;
+                v1.normalize();
+
+                var theta = Math.acos(v1.dot(v2));
+                var sign = v1.clone().cross(v2).z > 0 ? 1 : -1;//sign of theta
+                sign = index%2==0 ? sign*-1 : sign;//phase alternates on every index
+
+                var thetaSmall = (Math.PI-theta)/2;
+                var deltaY = _pleatDepth/(2*Math.tan(thetaSmall));
+                var polyLineVertices = [];
+                for (var i=0;i<=2*numPleats;i++){
+                    if (i%2==0) polyLineVertices.push([margin+i*_pleatDepth, margin+yOffset+sign*deltaY]);
+                    else polyLineVertices.push([margin+i*_pleatDepth, margin+yOffset-sign*deltaY]);
+                }
+                svg.polyline(polyLineVertices, scoreSettings);
+            } else if (index == rawProfile.length-1){
+                var v1 = vertex.clone().sub(rawProfile[index-1]);
+                yOffset+= v1.length()*10;
+            }
+        });
         for (var i=0;i<=2*numPleats;i++){
             var group = score;
             if (i==0 || i== 2*numPleats) group = solid;
-            svg.line(group, margin+i*_pleatDepth, margin, margin+i*_pleatDepth, 500+margin);
+            svg.line(group, margin+i*_pleatDepth, margin, margin+i*_pleatDepth, yOffset+margin);
         }
-        svg.line(solid, margin, margin, margin+numPleats*_pleatDepth*2, margin);
-        svg.line(solid, margin, 500+margin, margin+numPleats*_pleatDepth*2, 500+margin);
-        //_.each(profile, function(vertex, index){
-        //    if (index<rawProfile.length-1){
-        //        svg.line(g, vertex.x+200, -vertex.y+200, rawProfile[index+1].x+200, -rawProfile[index+1].y+200);
-        //    }
-        //});
+        svg.line(solid, margin, yOffset+margin, margin+numPleats*_pleatDepth*2, yOffset+margin);
+    }
+
+    function saveSVG(){
         var svgData = $("svg")[0].outerHTML;
         var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
         var svgUrl = URL.createObjectURL(svgBlob);
