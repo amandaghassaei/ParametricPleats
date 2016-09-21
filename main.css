@@ -151,3 +151,14 @@ a:active {color:#000000;}  /* selected link */
     margin: 20px 0 10px 0;
     padding: 4px 0;
 }
+
+#svgDiv{
+    /*display: none;*/
+    position: absolute;
+    width:600px;
+    height:600px;
+    top:0;
+    left:0;
+    z-index: 10;
+    background: white;
+}

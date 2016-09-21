@@ -15,6 +15,13 @@ $(function() {
     var justAddedVertex = false;
     var $addVertexDiv = $("#newVertex");
 
+    var rawProfile = [
+        new THREE.Vector3(-10, 20, 0),
+        new THREE.Vector3(-10, 15, 0),
+        new THREE.Vector3(-18, 0, 0),
+        new THREE.Vector3(-5, -20, 0)
+    ];
+
     var profile = [
         new THREE.Vector3(-10, 20, 0),
         new THREE.Vector3(-10, 15, 0),
@@ -22,6 +29,8 @@ $(function() {
         new THREE.Vector3(-5, -20, 0)
     ];
     var profileVertices;
+
+    $("#svgDiv").svg({onLoad: saveSVG});//svg renderer
 
     function calcProfileVertices(shouldRebuild){
 
@@ -124,6 +133,34 @@ $(function() {
     $('#addVertexMode').click(function(e){
         e.preventDefault();
         shouldAddVertex = true;
-    })
+    });
+
+    function saveSVG(svg){
+        var g = svg.group({stroke: 'black', strokeWidth: 1, strokeDasharray:"10, 10"});
+        var margin = 30;
+        var scale = 2;
+        var _pleatDepth = pleatDepth*scale;
+        for (var i=0;i<=2*numPleats;i++){
+            svg.line(g, margin+i*_pleatDepth, margin, margin+i*_pleatDepth, 500+margin);
+        }
+        svg.line(g, margin, margin, margin+numPleats*_pleatDepth*2, margin);
+        svg.line(g, margin, 500+margin, margin+numPleats*_pleatDepth*2, 500+margin);
+        //_.each(profile, function(vertex, index){
+        //    if (index<rawProfile.length-1){
+        //        svg.line(g, vertex.x+200, -vertex.y+200, rawProfile[index+1].x+200, -rawProfile[index+1].y+200);
+        //    }
+        //});
+        var svgData = $("svg")[0].outerHTML;
+        var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+        var svgUrl = URL.createObjectURL(svgBlob);
+        var downloadLink = document.createElement("a");
+        downloadLink.href = svgUrl;
+        downloadLink.download = "lamp.svg";
+        //document.body.appendChild(downloadLink);
+        //downloadLink.click();
+        //document.body.removeChild(downloadLink);
+    }
+
+
 
 });
